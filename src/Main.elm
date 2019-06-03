@@ -416,19 +416,19 @@ isCellBetweenAgainstQueen ( i, j ) ( ( i0, j0 ), ( i1, j1 ) ) =
                )
 
     else if (0 < (i1 - i0)) && (0 < (j1 - j0)) && (i1 - i0) == (j1 - j0) then
-        -- Diagonal lower - right
+        -- Diagonal down - right
         (i0 < i) && (i < i1) && (j0 < j) && (j < j1) && ((i - i0) == (j - j0))
 
     else if (0 < (i1 - i0)) && (0 < (j0 - j1)) && (i1 - i0) == (j0 - j1) then
-        -- Diagonal upper - right
-        (i0 < i) && (i < i1) && (j1 < j) && (j < j0) && ((i - i0) == (j - j1))
+        -- Diagonal down - left
+        (i0 < i) && (i < i1) && (j1 < j) && (j < j0) && ((i - i0) == (j0 - j))
 
     else if (0 < (i0 - i1)) && (0 < (j1 - j0)) && (i0 - i1) == (j1 - j0) then
-        -- Diagonal lower - left
-        (i1 < i) && (i < i0) && (j0 < j) && (j < j1) && ((i - i1) == (j - j0))
+        -- Diagonal up - right
+        (i1 < i) && (i < i0) && (j0 < j) && (j < j1) && ((i - i1) == (j1 - j))
 
     else if (0 < (i0 - i1)) && (0 < (j0 - j1)) && (i0 - i1) == (j0 - j1) then
-        -- Diagonal upper - left
+        -- Diagonal up - left
         (i1 < i) && (i < i0) && (j1 < j) && (j < j0) && ((i - i1) == (j - j1))
 
     else
@@ -438,7 +438,7 @@ isCellBetweenAgainstQueen ( i, j ) ( ( i0, j0 ), ( i1, j1 ) ) =
 isCellBetweenAgainstQueens : Position -> List ( Position, Position ) -> Bool
 isCellBetweenAgainstQueens ( i, j ) queenAgainst =
     List.foldr
-        (\coupleQueen res -> res || isCellBetweenAgainstQueen ( i, j ) coupleQueen)
+        (\coupleQueen res -> res || isCellBetweenAgainstQueen ( i, j ) (Debug.log "coupleQueen" coupleQueen))
         False
         queenAgainst
 
@@ -449,8 +449,8 @@ viewBoardCell selectedQueen queenAgainst maybeQueen i j =
         [ style "border" "1px solid #505050"
         , style "text-align" "center"
         , style "padding" "0px"
-        , style "width" "2rem"
-        , style "height" "2rem"
+        , style "width" "4rem"
+        , style "height" "4rem"
         , style "background-color"
             (if modBy 2 (i + j) == 0 then
                 "black"
