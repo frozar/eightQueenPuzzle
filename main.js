@@ -4870,8 +4870,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$NothingSelected = {$: 'NothingSelected'};
-var author$project$Main$nbPiece = 8;
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
@@ -5134,10 +5132,12 @@ var elm$core$Array$repeat = F2(
 			});
 	});
 var elm$core$Maybe$Nothing = {$: 'Nothing'};
-var author$project$Main$initBoard = A2(
-	elm$core$Array$repeat,
-	author$project$Main$nbPiece,
-	A2(elm$core$Array$repeat, author$project$Main$nbPiece, elm$core$Maybe$Nothing));
+var author$project$Board$init = function (nbPiece) {
+	return A2(
+		elm$core$Array$repeat,
+		nbPiece,
+		A2(elm$core$Array$repeat, nbPiece, elm$core$Maybe$Nothing));
+};
 var author$project$Main$noneQueen = 'xx';
 var elm$core$Basics$append = _Utils_append;
 var elm$core$List$length = function (xs) {
@@ -5215,12 +5215,13 @@ var author$project$Main$initQueens = A2(
 			return 'Q' + elm$core$String$fromInt(i);
 		}),
 	A2(elm$core$List$repeat, 8, author$project$Main$noneQueen));
-var author$project$Main$init = {board: author$project$Main$initBoard, queenAgainst: _List_Nil, queens: author$project$Main$initQueens, selectedQueen: author$project$Main$NothingSelected};
-var author$project$Main$Available = function (a) {
-	return {$: 'Available', a: a};
-};
-var author$project$Main$Placed = function (a) {
-	return {$: 'Placed', a: a};
+var author$project$Main$nbPiece = 8;
+var author$project$SelectedQueen$NothingSelected = {$: 'NothingSelected'};
+var author$project$Main$init = {
+	board: author$project$Board$init(author$project$Main$nbPiece),
+	queenAgainst: _List_Nil,
+	queens: author$project$Main$initQueens,
+	selectedQueen: author$project$SelectedQueen$NothingSelected
 };
 var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var elm$core$Array$bitMask = 4294967295 >>> (32 - elm$core$Array$shiftStep);
@@ -5265,7 +5266,7 @@ var elm$core$Array$get = F2(
 			A2(elm$core$Elm$JsArray$unsafeGet, elm$core$Array$bitMask & index, tail)) : elm$core$Maybe$Just(
 			A3(elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var author$project$Main$hasQueenAt = F3(
+var author$project$Board$hasQueenAt = F3(
 	function (board, iPlace, jPlace) {
 		var _n0 = A2(elm$core$Array$get, iPlace, board);
 		if (_n0.$ === 'Just') {
@@ -5321,7 +5322,7 @@ var elm$core$Array$indexedMap = F2(
 			A3(elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
 	});
 var elm$core$Basics$and = _Basics_and;
-var author$project$Main$placeQueen = F4(
+var author$project$Board$placeQueen = F4(
 	function (board, queen, iPlace, jPlace) {
 		return A2(
 			elm$core$Array$indexedMap,
@@ -5345,82 +5346,6 @@ var author$project$Main$placeQueen = F4(
 						arrayQueen);
 				}),
 			board);
-	});
-var elm$core$Basics$neq = _Utils_notEqual;
-var elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							elm$core$List$foldl,
-							fn,
-							acc,
-							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var author$project$Main$removeQueenAvailable = F2(
-	function (queen, listQueen) {
-		return A2(
-			elm$core$List$filter,
-			function (q) {
-				return !_Utils_eq(q, queen);
-			},
-			listQueen);
 	});
 var elm$core$Elm$JsArray$map = _JsArray_map;
 var elm$core$Array$map = F2(
@@ -5447,7 +5372,7 @@ var elm$core$Array$map = F2(
 			A2(elm$core$Elm$JsArray$map, helper, tree),
 			A2(elm$core$Elm$JsArray$map, func, tail));
 	});
-var author$project$Main$removeQueenBoard = F2(
+var author$project$Board$removeQueen = F2(
 	function (board, queen) {
 		return A2(
 			elm$core$Array$map,
@@ -5694,7 +5619,7 @@ var elm$core$Array$slice = F3(
 			correctFrom,
 			A2(elm$core$Array$sliceRight, correctTo, array));
 	});
-var author$project$Main$arrayDrop = F2(
+var author$project$Board$arrayDrop = F2(
 	function (n, array) {
 		return A3(
 			elm$core$Array$slice,
@@ -5702,7 +5627,7 @@ var author$project$Main$arrayDrop = F2(
 			elm$core$Array$length(array),
 			array);
 	});
-var author$project$Main$getQueenPositionRow = F4(
+var author$project$Board$getQueenPositionRow = F4(
 	function (i, j, maybeQueens, listPosition) {
 		getQueenPositionRow:
 		while (true) {
@@ -5713,7 +5638,7 @@ var author$project$Main$getQueenPositionRow = F4(
 					var queen = maybeQueen.a;
 					var $temp$i = i,
 						$temp$j = j + 1,
-						$temp$maybeQueens = A2(author$project$Main$arrayDrop, 1, maybeQueens),
+						$temp$maybeQueens = A2(author$project$Board$arrayDrop, 1, maybeQueens),
 						$temp$listPosition = A2(
 						elm$core$List$cons,
 						_Utils_Tuple2(i, j),
@@ -5726,7 +5651,7 @@ var author$project$Main$getQueenPositionRow = F4(
 				} else {
 					var $temp$i = i,
 						$temp$j = j + 1,
-						$temp$maybeQueens = A2(author$project$Main$arrayDrop, 1, maybeQueens),
+						$temp$maybeQueens = A2(author$project$Board$arrayDrop, 1, maybeQueens),
 						$temp$listPosition = listPosition;
 					i = $temp$i;
 					j = $temp$j;
@@ -5739,27 +5664,27 @@ var author$project$Main$getQueenPositionRow = F4(
 			}
 		}
 	});
-var author$project$Main$getQueenPositionBoard = F3(
+var author$project$Board$getQueenPosition = F3(
 	function (i, board, listPosition) {
-		getQueenPositionBoard:
+		getQueenPosition:
 		while (true) {
 			var _n0 = A2(elm$core$Array$get, 0, board);
 			if (_n0.$ === 'Just') {
 				var maybeQueens = _n0.a;
 				var $temp$i = i + 1,
-					$temp$board = A2(author$project$Main$arrayDrop, 1, board),
-					$temp$listPosition = A4(author$project$Main$getQueenPositionRow, i, 0, maybeQueens, listPosition);
+					$temp$board = A2(author$project$Board$arrayDrop, 1, board),
+					$temp$listPosition = A4(author$project$Board$getQueenPositionRow, i, 0, maybeQueens, listPosition);
 				i = $temp$i;
 				board = $temp$board;
 				listPosition = $temp$listPosition;
-				continue getQueenPositionBoard;
+				continue getQueenPosition;
 			} else {
 				return listPosition;
 			}
 		}
 	});
-var author$project$Main$getPlacedQueens = function (board) {
-	return A3(author$project$Main$getQueenPositionBoard, 0, board, _List_Nil);
+var author$project$Board$getPlacedQueens = function (board) {
+	return A3(author$project$Board$getQueenPosition, 0, board, _List_Nil);
 };
 var elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5767,7 +5692,7 @@ var elm$core$Basics$negate = function (n) {
 var elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var author$project$Main$areAgainst = F2(
+var author$project$Board$areAgainst = F2(
 	function (_n0, _n1) {
 		var i0 = _n0.a;
 		var j0 = _n0.b;
@@ -5776,6 +5701,61 @@ var author$project$Main$areAgainst = F2(
 		return _Utils_eq(i0, i1) || (_Utils_eq(j0, j1) || _Utils_eq(
 			elm$core$Basics$abs(i0 - i1),
 			elm$core$Basics$abs(j0 - j1)));
+	});
+var elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							elm$core$List$foldl,
+							fn,
+							acc,
+							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
 var elm$core$List$append = F2(
 	function (xs, ys) {
@@ -5812,7 +5792,7 @@ var elm$core$List$head = function (list) {
 		return elm$core$Maybe$Nothing;
 	}
 };
-var author$project$Main$getQueenAgainst = F2(
+var author$project$Board$getQueenAgainst = F2(
 	function (listQueenPosition, res) {
 		getQueenAgainst:
 		while (true) {
@@ -5825,7 +5805,7 @@ var author$project$Main$getQueenAgainst = F2(
 					elm$core$List$filterMap,
 					function (pos) {
 						return A2(
-							author$project$Main$areAgainst,
+							author$project$Board$areAgainst,
 							_Utils_Tuple2(i, j),
 							pos) ? elm$core$Maybe$Just(
 							_Utils_Tuple2(
@@ -5843,11 +5823,38 @@ var author$project$Main$getQueenAgainst = F2(
 			}
 		}
 	});
-var author$project$Main$updateQueenAgainst = function (board) {
+var author$project$Board$updateQueenAgainst = function (board) {
 	return A2(
-		author$project$Main$getQueenAgainst,
-		author$project$Main$getPlacedQueens(board),
+		author$project$Board$getQueenAgainst,
+		author$project$Board$getPlacedQueens(board),
 		_List_Nil);
+};
+var elm$core$Basics$neq = _Utils_notEqual;
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var author$project$Main$removeQueenAvailable = F2(
+	function (queen, listQueen) {
+		return A2(
+			elm$core$List$filter,
+			function (q) {
+				return !_Utils_eq(q, queen);
+			},
+			listQueen);
+	});
+var author$project$SelectedQueen$Available = function (a) {
+	return {$: 'Available', a: a};
+};
+var author$project$SelectedQueen$Placed = function (a) {
+	return {$: 'Placed', a: a};
 };
 var author$project$Main$update = F2(
 	function (msg, model) {
@@ -5860,29 +5867,29 @@ var author$project$Main$update = F2(
 						var selectedAvailableQueen = _n1.a;
 						return _Utils_eq(queen, selectedAvailableQueen) ? _Utils_update(
 							model,
-							{selectedQueen: author$project$Main$NothingSelected}) : _Utils_update(
+							{selectedQueen: author$project$SelectedQueen$NothingSelected}) : _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$Main$Available(queen)
+								selectedQueen: author$project$SelectedQueen$Available(queen)
 							});
 					case 'Placed':
 						var selectedPlacedQueen = _n1.a;
 						return _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$Main$Available(queen)
+								selectedQueen: author$project$SelectedQueen$Available(queen)
 							});
 					default:
 						return _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$Main$Available(queen)
+								selectedQueen: author$project$SelectedQueen$Available(queen)
 							});
 				}
 			case 'SelectCell':
 				var i = msg.a;
 				var j = msg.b;
-				var _n2 = A3(author$project$Main$hasQueenAt, model.board, i, j);
+				var _n2 = A3(author$project$Board$hasQueenAt, model.board, i, j);
 				if (_n2.$ === 'Just') {
 					var queen = _n2.a;
 					var _n3 = model.selectedQueen;
@@ -5890,20 +5897,20 @@ var author$project$Main$update = F2(
 						case 'Placed':
 							var alreadySelectedQueen = _n3.a;
 							if (_Utils_eq(alreadySelectedQueen, queen)) {
-								var updatedBoard = A2(author$project$Main$removeQueenBoard, model.board, queen);
+								var updatedBoard = A2(author$project$Board$removeQueen, model.board, queen);
 								return _Utils_update(
 									model,
 									{
 										board: updatedBoard,
-										queenAgainst: author$project$Main$updateQueenAgainst(updatedBoard),
+										queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
 										queens: A2(elm$core$List$cons, alreadySelectedQueen, model.queens),
-										selectedQueen: author$project$Main$NothingSelected
+										selectedQueen: author$project$SelectedQueen$NothingSelected
 									});
 							} else {
 								return _Utils_update(
 									model,
 									{
-										selectedQueen: author$project$Main$Placed(queen)
+										selectedQueen: author$project$SelectedQueen$Placed(queen)
 									});
 							}
 						case 'Available':
@@ -5911,13 +5918,13 @@ var author$project$Main$update = F2(
 							return _Utils_update(
 								model,
 								{
-									selectedQueen: author$project$Main$Placed(queen)
+									selectedQueen: author$project$SelectedQueen$Placed(queen)
 								});
 						default:
 							return _Utils_update(
 								model,
 								{
-									selectedQueen: author$project$Main$Placed(queen)
+									selectedQueen: author$project$SelectedQueen$Placed(queen)
 								});
 					}
 				} else {
@@ -5925,24 +5932,24 @@ var author$project$Main$update = F2(
 					switch (_n4.$) {
 						case 'Available':
 							var queen = _n4.a;
-							var updatedBoard = A4(author$project$Main$placeQueen, model.board, queen, i, j);
+							var updatedBoard = A4(author$project$Board$placeQueen, model.board, queen, i, j);
 							return _Utils_update(
 								model,
 								{
 									board: updatedBoard,
-									queenAgainst: author$project$Main$updateQueenAgainst(updatedBoard),
+									queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
 									queens: A2(author$project$Main$removeQueenAvailable, queen, model.queens),
-									selectedQueen: author$project$Main$NothingSelected
+									selectedQueen: author$project$SelectedQueen$NothingSelected
 								});
 						case 'Placed':
 							var queen = _n4.a;
-							var updatedBoard = A4(author$project$Main$placeQueen, model.board, queen, i, j);
+							var updatedBoard = A4(author$project$Board$placeQueen, model.board, queen, i, j);
 							return _Utils_update(
 								model,
 								{
 									board: updatedBoard,
-									queenAgainst: author$project$Main$updateQueenAgainst(updatedBoard),
-									selectedQueen: author$project$Main$NothingSelected
+									queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
+									selectedQueen: author$project$SelectedQueen$NothingSelected
 								});
 						default:
 							return model;
@@ -5951,15 +5958,15 @@ var author$project$Main$update = F2(
 			default:
 				return _Utils_update(
 					model,
-					{board: author$project$Main$initBoard, queenAgainst: _List_Nil, queens: author$project$Main$initQueens, selectedQueen: author$project$Main$NothingSelected});
+					{
+						board: author$project$Board$init(author$project$Main$nbPiece),
+						queenAgainst: _List_Nil,
+						queens: author$project$Main$initQueens,
+						selectedQueen: author$project$SelectedQueen$NothingSelected
+					});
 		}
 	});
-var author$project$Main$Reset = {$: 'Reset'};
-var author$project$Main$SelectCell = F2(
-	function (a, b) {
-		return {$: 'SelectCell', a: a, b: b};
-	});
-var author$project$Main$isCellBetweenAgainstQueen = F2(
+var author$project$Board$isCellBetweenAgainstQueen = F2(
 	function (_n0, _n1) {
 		var i = _n0.a;
 		var j = _n0.b;
@@ -5971,8 +5978,7 @@ var author$project$Main$isCellBetweenAgainstQueen = F2(
 		var j1 = _n3.b;
 		return _Utils_eq(i0, i1) ? (_Utils_eq(i, i0) && (((_Utils_cmp(j0, j) < 0) && (_Utils_cmp(j, j1) < 0)) || ((_Utils_cmp(j1, j) < 0) && (_Utils_cmp(j, j0) < 0)))) : (_Utils_eq(j0, j1) ? (_Utils_eq(j, j0) && (((_Utils_cmp(i0, i) < 0) && (_Utils_cmp(i, i1) < 0)) || ((_Utils_cmp(i1, i) < 0) && (_Utils_cmp(i, i0) < 0)))) : (((0 < (i1 - i0)) && ((0 < (j1 - j0)) && _Utils_eq(i1 - i0, j1 - j0))) ? ((_Utils_cmp(i0, i) < 0) && ((_Utils_cmp(i, i1) < 0) && ((_Utils_cmp(j0, j) < 0) && ((_Utils_cmp(j, j1) < 0) && _Utils_eq(i - i0, j - j0))))) : (((0 < (i1 - i0)) && ((0 < (j0 - j1)) && _Utils_eq(i1 - i0, j0 - j1))) ? ((_Utils_cmp(i0, i) < 0) && ((_Utils_cmp(i, i1) < 0) && ((_Utils_cmp(j1, j) < 0) && ((_Utils_cmp(j, j0) < 0) && _Utils_eq(i - i0, j0 - j))))) : (((0 < (i0 - i1)) && ((0 < (j1 - j0)) && _Utils_eq(i0 - i1, j1 - j0))) ? ((_Utils_cmp(i1, i) < 0) && ((_Utils_cmp(i, i0) < 0) && ((_Utils_cmp(j0, j) < 0) && ((_Utils_cmp(j, j1) < 0) && _Utils_eq(i - i1, j1 - j))))) : (((0 < (i0 - i1)) && ((0 < (j0 - j1)) && _Utils_eq(i0 - i1, j0 - j1))) ? ((_Utils_cmp(i1, i) < 0) && ((_Utils_cmp(i, i0) < 0) && ((_Utils_cmp(j1, j) < 0) && ((_Utils_cmp(j, j0) < 0) && _Utils_eq(i - i1, j - j1))))) : false)))));
 	});
-var elm$core$Debug$log = _Debug_log;
-var author$project$Main$isCellBetweenAgainstQueens = F2(
+var author$project$Board$isCellBetweenAgainstQueens = F2(
 	function (_n0, queenAgainst) {
 		var i = _n0.a;
 		var j = _n0.b;
@@ -5981,14 +5987,14 @@ var author$project$Main$isCellBetweenAgainstQueens = F2(
 			F2(
 				function (coupleQueen, res) {
 					return res || A2(
-						author$project$Main$isCellBetweenAgainstQueen,
+						author$project$Board$isCellBetweenAgainstQueen,
 						_Utils_Tuple2(i, j),
-						A2(elm$core$Debug$log, 'coupleQueen', coupleQueen));
+						coupleQueen);
 				}),
 			false,
 			queenAgainst);
 	});
-var author$project$Main$isSelected = F2(
+var author$project$Board$isSelected = F2(
 	function (selectedQueen, q0) {
 		switch (selectedQueen.$) {
 			case 'Available':
@@ -6000,6 +6006,10 @@ var author$project$Main$isSelected = F2(
 			default:
 				return false;
 		}
+	});
+var author$project$Msg$SelectCell = F2(
+	function (a, b) {
+		return {$: 'SelectCell', a: a, b: b};
 	});
 var elm$core$Basics$modBy = _Basics_modBy;
 var elm$core$Basics$identity = function (x) {
@@ -6214,7 +6224,7 @@ var elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		elm$json$Json$Decode$succeed(msg));
 };
-var author$project$Main$viewBoardCell = F5(
+var author$project$Board$viewBoardCell = F5(
 	function (selectedQueen, queenAgainst, maybeQueen, i, j) {
 		return A2(
 			elm$html$Html$td,
@@ -6230,7 +6240,7 @@ var author$project$Main$viewBoardCell = F5(
 					'background-color',
 					(!A2(elm$core$Basics$modBy, 2, i + j)) ? 'black' : 'white'),
 					elm$html$Html$Events$onClick(
-					A2(author$project$Main$SelectCell, i, j))
+					A2(author$project$Msg$SelectCell, i, j))
 				]),
 			_List_fromArray(
 				[
@@ -6244,7 +6254,7 @@ var author$project$Main$viewBoardCell = F5(
 									A2(
 									elm$html$Html$Attributes$style,
 									'color',
-									A2(author$project$Main$isSelected, selectedQueen, queen) ? 'red' : ((!A2(elm$core$Basics$modBy, 2, i + j)) ? 'white' : 'black'))
+									A2(author$project$Board$isSelected, selectedQueen, queen) ? 'red' : ((!A2(elm$core$Basics$modBy, 2, i + j)) ? 'white' : 'black'))
 								]),
 							_List_fromArray(
 								[
@@ -6263,7 +6273,7 @@ var author$project$Main$viewBoardCell = F5(
 							_List_fromArray(
 								[
 									A2(
-									author$project$Main$isCellBetweenAgainstQueens,
+									author$project$Board$isCellBetweenAgainstQueens,
 									_Utils_Tuple2(i, j),
 									queenAgainst) ? elm$html$Html$text('X') : elm$html$Html$text('')
 								]));
@@ -6274,7 +6284,7 @@ var author$project$Main$viewBoardCell = F5(
 var elm$html$Html$table = _VirtualDom_node('table');
 var elm$html$Html$tbody = _VirtualDom_node('tbody');
 var elm$html$Html$tr = _VirtualDom_node('tr');
-var author$project$Main$viewBoard = F3(
+var author$project$Board$viewBoard = F3(
 	function (board, selectedQueen, queenAgainst) {
 		return A2(
 			elm$html$Html$table,
@@ -6301,14 +6311,14 @@ var author$project$Main$viewBoard = F3(
 												elm$core$Array$indexedMap,
 												F2(
 													function (j, maybeQueen) {
-														return A5(author$project$Main$viewBoardCell, selectedQueen, queenAgainst, maybeQueen, i, j);
+														return A5(author$project$Board$viewBoardCell, selectedQueen, queenAgainst, maybeQueen, i, j);
 													}),
 												arrayQueen)));
 								}),
 							board)))
 				]));
 	});
-var author$project$Main$Select = function (a) {
+var author$project$Msg$Select = function (a) {
 	return {$: 'Select', a: a};
 };
 var author$project$Main$viewQueen = F2(
@@ -6318,12 +6328,12 @@ var author$project$Main$viewQueen = F2(
 			_List_fromArray(
 				[
 					elm$html$Html$Events$onClick(
-					author$project$Main$Select(queen)),
+					author$project$Msg$Select(queen)),
 					A2(elm$html$Html$Attributes$style, 'padding', '0.45em'),
 					A2(
 					elm$html$Html$Attributes$style,
 					'color',
-					A2(author$project$Main$isSelected, selectedQueen, queen) ? 'red' : 'black')
+					A2(author$project$Board$isSelected, selectedQueen, queen) ? 'red' : 'black')
 				]),
 			_List_fromArray(
 				[
@@ -6340,6 +6350,7 @@ var elm$core$List$isEmpty = function (xs) {
 var author$project$Main$viewVictory = function (model) {
 	return (elm$core$List$isEmpty(model.queens) && elm$core$List$isEmpty(model.queenAgainst)) ? elm$html$Html$text('VICTORY') : elm$html$Html$text('');
 };
+var author$project$Msg$Reset = {$: 'Reset'};
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -6373,7 +6384,7 @@ var author$project$Main$view = function (model) {
 					[
 						elm$html$Html$text('8 Queens Puzzle')
 					])),
-				A3(author$project$Main$viewBoard, model.board, model.selectedQueen, model.queenAgainst),
+				A3(author$project$Board$viewBoard, model.board, model.selectedQueen, model.queenAgainst),
 				A2(
 				elm$html$Html$div,
 				_List_Nil,
@@ -6409,7 +6420,7 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$button,
 						_List_fromArray(
 							[
-								elm$html$Html$Events$onClick(author$project$Main$Reset)
+								elm$html$Html$Events$onClick(author$project$Msg$Reset)
 							]),
 						_List_fromArray(
 							[
@@ -10526,4 +10537,4 @@ var elm$browser$Browser$sandbox = function (impl) {
 var author$project$Main$main = elm$browser$Browser$sandbox(
 	{init: author$project$Main$init, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Main.Queen":{"args":[],"type":"String.String"}},"unions":{"Main.Msg":{"args":[],"tags":{"Select":["Main.Queen"],"SelectCell":["Basics.Int","Basics.Int"],"Reset":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Msg.Msg","aliases":{"Queen.Queen":{"args":[],"type":"String.String"}},"unions":{"Msg.Msg":{"args":[],"tags":{"Select":["Queen.Queen"],"SelectCell":["Basics.Int","Basics.Int"],"Reset":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
