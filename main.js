@@ -5216,12 +5216,12 @@ var author$project$Main$initQueens = A2(
 		}),
 	A2(elm$core$List$repeat, 8, author$project$Main$noneQueen));
 var author$project$Main$nbPiece = 8;
-var author$project$SelectedQueen$NothingSelected = {$: 'NothingSelected'};
+var author$project$Queen$NothingSelected = {$: 'NothingSelected'};
 var author$project$Main$init = {
 	board: author$project$Board$init(author$project$Main$nbPiece),
 	queenAgainst: _List_Nil,
 	queens: author$project$Main$initQueens,
-	selectedQueen: author$project$SelectedQueen$NothingSelected
+	selectedQueen: author$project$Queen$NothingSelected
 };
 var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var elm$core$Array$bitMask = 4294967295 >>> (32 - elm$core$Array$shiftStep);
@@ -5850,10 +5850,10 @@ var author$project$Main$removeQueenAvailable = F2(
 			},
 			listQueen);
 	});
-var author$project$SelectedQueen$Available = function (a) {
+var author$project$Queen$Available = function (a) {
 	return {$: 'Available', a: a};
 };
-var author$project$SelectedQueen$Placed = function (a) {
+var author$project$Queen$Placed = function (a) {
 	return {$: 'Placed', a: a};
 };
 var author$project$Main$update = F2(
@@ -5867,23 +5867,23 @@ var author$project$Main$update = F2(
 						var selectedAvailableQueen = _n1.a;
 						return _Utils_eq(queen, selectedAvailableQueen) ? _Utils_update(
 							model,
-							{selectedQueen: author$project$SelectedQueen$NothingSelected}) : _Utils_update(
+							{selectedQueen: author$project$Queen$NothingSelected}) : _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$SelectedQueen$Available(queen)
+								selectedQueen: author$project$Queen$Available(queen)
 							});
 					case 'Placed':
 						var selectedPlacedQueen = _n1.a;
 						return _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$SelectedQueen$Available(queen)
+								selectedQueen: author$project$Queen$Available(queen)
 							});
 					default:
 						return _Utils_update(
 							model,
 							{
-								selectedQueen: author$project$SelectedQueen$Available(queen)
+								selectedQueen: author$project$Queen$Available(queen)
 							});
 				}
 			case 'SelectCell':
@@ -5904,13 +5904,13 @@ var author$project$Main$update = F2(
 										board: updatedBoard,
 										queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
 										queens: A2(elm$core$List$cons, alreadySelectedQueen, model.queens),
-										selectedQueen: author$project$SelectedQueen$NothingSelected
+										selectedQueen: author$project$Queen$NothingSelected
 									});
 							} else {
 								return _Utils_update(
 									model,
 									{
-										selectedQueen: author$project$SelectedQueen$Placed(queen)
+										selectedQueen: author$project$Queen$Placed(queen)
 									});
 							}
 						case 'Available':
@@ -5918,13 +5918,13 @@ var author$project$Main$update = F2(
 							return _Utils_update(
 								model,
 								{
-									selectedQueen: author$project$SelectedQueen$Placed(queen)
+									selectedQueen: author$project$Queen$Placed(queen)
 								});
 						default:
 							return _Utils_update(
 								model,
 								{
-									selectedQueen: author$project$SelectedQueen$Placed(queen)
+									selectedQueen: author$project$Queen$Placed(queen)
 								});
 					}
 				} else {
@@ -5939,7 +5939,7 @@ var author$project$Main$update = F2(
 									board: updatedBoard,
 									queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
 									queens: A2(author$project$Main$removeQueenAvailable, queen, model.queens),
-									selectedQueen: author$project$SelectedQueen$NothingSelected
+									selectedQueen: author$project$Queen$NothingSelected
 								});
 						case 'Placed':
 							var queen = _n4.a;
@@ -5949,7 +5949,7 @@ var author$project$Main$update = F2(
 								{
 									board: updatedBoard,
 									queenAgainst: author$project$Board$updateQueenAgainst(updatedBoard),
-									selectedQueen: author$project$SelectedQueen$NothingSelected
+									selectedQueen: author$project$Queen$NothingSelected
 								});
 						default:
 							return model;
@@ -5962,7 +5962,7 @@ var author$project$Main$update = F2(
 						board: author$project$Board$init(author$project$Main$nbPiece),
 						queenAgainst: _List_Nil,
 						queens: author$project$Main$initQueens,
-						selectedQueen: author$project$SelectedQueen$NothingSelected
+						selectedQueen: author$project$Queen$NothingSelected
 					});
 		}
 	});
@@ -5994,7 +5994,11 @@ var author$project$Board$isCellBetweenAgainstQueens = F2(
 			false,
 			queenAgainst);
 	});
-var author$project$Board$isSelected = F2(
+var author$project$Queen$SelectCell = F2(
+	function (a, b) {
+		return {$: 'SelectCell', a: a, b: b};
+	});
+var author$project$Queen$isSelected = F2(
 	function (selectedQueen, q0) {
 		switch (selectedQueen.$) {
 			case 'Available':
@@ -6006,10 +6010,6 @@ var author$project$Board$isSelected = F2(
 			default:
 				return false;
 		}
-	});
-var author$project$Msg$SelectCell = F2(
-	function (a, b) {
-		return {$: 'SelectCell', a: a, b: b};
 	});
 var elm$core$Basics$modBy = _Basics_modBy;
 var elm$core$Basics$identity = function (x) {
@@ -6240,7 +6240,7 @@ var author$project$Board$viewBoardCell = F5(
 					'background-color',
 					(!A2(elm$core$Basics$modBy, 2, i + j)) ? 'black' : 'white'),
 					elm$html$Html$Events$onClick(
-					A2(author$project$Msg$SelectCell, i, j))
+					A2(author$project$Queen$SelectCell, i, j))
 				]),
 			_List_fromArray(
 				[
@@ -6254,7 +6254,7 @@ var author$project$Board$viewBoardCell = F5(
 									A2(
 									elm$html$Html$Attributes$style,
 									'color',
-									A2(author$project$Board$isSelected, selectedQueen, queen) ? 'red' : ((!A2(elm$core$Basics$modBy, 2, i + j)) ? 'white' : 'black'))
+									A2(author$project$Queen$isSelected, selectedQueen, queen) ? 'red' : ((!A2(elm$core$Basics$modBy, 2, i + j)) ? 'white' : 'black'))
 								]),
 							_List_fromArray(
 								[
@@ -6318,28 +6318,6 @@ var author$project$Board$viewBoard = F3(
 							board)))
 				]));
 	});
-var author$project$Msg$Select = function (a) {
-	return {$: 'Select', a: a};
-};
-var author$project$Main$viewQueen = F2(
-	function (selectedQueen, queen) {
-		return A2(
-			elm$html$Html$span,
-			_List_fromArray(
-				[
-					elm$html$Html$Events$onClick(
-					author$project$Msg$Select(queen)),
-					A2(elm$html$Html$Attributes$style, 'padding', '0.45em'),
-					A2(
-					elm$html$Html$Attributes$style,
-					'color',
-					A2(author$project$Board$isSelected, selectedQueen, queen) ? 'red' : 'black')
-				]),
-			_List_fromArray(
-				[
-					elm$html$Html$text(queen)
-				]));
-	});
 var elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -6350,7 +6328,29 @@ var elm$core$List$isEmpty = function (xs) {
 var author$project$Main$viewVictory = function (model) {
 	return (elm$core$List$isEmpty(model.queens) && elm$core$List$isEmpty(model.queenAgainst)) ? elm$html$Html$text('VICTORY') : elm$html$Html$text('');
 };
-var author$project$Msg$Reset = {$: 'Reset'};
+var author$project$Queen$Reset = {$: 'Reset'};
+var author$project$Queen$Select = function (a) {
+	return {$: 'Select', a: a};
+};
+var author$project$Queen$view = F2(
+	function (selectedQueen, queen) {
+		return A2(
+			elm$html$Html$span,
+			_List_fromArray(
+				[
+					elm$html$Html$Events$onClick(
+					author$project$Queen$Select(queen)),
+					A2(elm$html$Html$Attributes$style, 'padding', '0.45em'),
+					A2(
+					elm$html$Html$Attributes$style,
+					'color',
+					A2(author$project$Queen$isSelected, selectedQueen, queen) ? 'red' : 'black')
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text(queen)
+				]));
+	});
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -6395,7 +6395,7 @@ var author$project$Main$view = function (model) {
 						_List_Nil,
 						A2(
 							elm$core$List$map,
-							author$project$Main$viewQueen(model.selectedQueen),
+							author$project$Queen$view(model.selectedQueen),
 							model.queens))
 					])),
 				A2(
@@ -6420,7 +6420,7 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$button,
 						_List_fromArray(
 							[
-								elm$html$Html$Events$onClick(author$project$Msg$Reset)
+								elm$html$Html$Events$onClick(author$project$Queen$Reset)
 							]),
 						_List_fromArray(
 							[
@@ -10537,4 +10537,4 @@ var elm$browser$Browser$sandbox = function (impl) {
 var author$project$Main$main = elm$browser$Browser$sandbox(
 	{init: author$project$Main$init, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Msg.Msg","aliases":{"Queen.Queen":{"args":[],"type":"String.String"}},"unions":{"Msg.Msg":{"args":[],"tags":{"Select":["Queen.Queen"],"SelectCell":["Basics.Int","Basics.Int"],"Reset":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Queen.Msg","aliases":{"Queen.Queen":{"args":[],"type":"String.String"}},"unions":{"Queen.Msg":{"args":[],"tags":{"Select":["Queen.Queen"],"SelectCell":["Basics.Int","Basics.Int"],"Reset":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));

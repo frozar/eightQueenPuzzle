@@ -1,17 +1,10 @@
-module Board exposing (Board, hasQueenAt, init, isSelected, placeQueen, removeQueen, updateQueenAgainst, viewBoard)
+module Board exposing (Board, hasQueenAt, init, placeQueen, removeQueen, updateQueenAgainst, viewBoard)
 
 import Array exposing (Array)
 import Html exposing (Html, button, div, h1, span, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Msg exposing (Msg)
-import Queen exposing (Queen)
-import SelectedQueen exposing (SelectedQueen)
-
-
-
--- type alias Queen =
---     String
+import Queen exposing (Msg, Queen)
 
 
 type alias Position =
@@ -20,13 +13,6 @@ type alias Position =
 
 type alias Board =
     Array (Array (Maybe Queen))
-
-
-
--- type SelectedQueen
---     = Available Queen
---     | Placed Queen
---     | NothingSelected
 
 
 init : Int -> Board
@@ -180,13 +166,10 @@ updateQueenAgainst board =
 
 
 
--- UPDATE
--- type Msg
---     = SelectCell Int Int
 -- VIEW
 
 
-viewBoard : Board -> SelectedQueen -> List ( Position, Position ) -> Html.Html Msg
+viewBoard : Board -> Queen.SelectedQueen -> List ( Position, Position ) -> Html.Html Msg
 viewBoard board selectedQueen queenAgainst =
     Html.table
         [ style "margin-left" "auto"
@@ -256,20 +239,7 @@ isCellBetweenAgainstQueens ( i, j ) queenAgainst =
         queenAgainst
 
 
-isSelected : SelectedQueen -> Queen -> Bool
-isSelected selectedQueen q0 =
-    case selectedQueen of
-        SelectedQueen.Available q1 ->
-            q0 == q1
-
-        SelectedQueen.Placed q1 ->
-            q0 == q1
-
-        SelectedQueen.NothingSelected ->
-            False
-
-
-viewBoardCell : SelectedQueen -> List ( Position, Position ) -> Maybe Queen -> Int -> Int -> Html.Html Msg
+viewBoardCell : Queen.SelectedQueen -> List ( Position, Position ) -> Maybe Queen -> Int -> Int -> Html.Html Msg
 viewBoardCell selectedQueen queenAgainst maybeQueen i j =
     Html.td
         [ style "border" "1px solid #505050"
@@ -284,13 +254,13 @@ viewBoardCell selectedQueen queenAgainst maybeQueen i j =
              else
                 "white"
             )
-        , onClick (Msg.SelectCell i j)
+        , onClick (Queen.SelectCell i j)
         ]
         [ case maybeQueen of
             Just queen ->
                 span
                     [ style "color"
-                        (if isSelected selectedQueen queen then
+                        (if Queen.isSelected selectedQueen queen then
                             "red"
 
                          else if modBy 2 (i + j) == 0 then

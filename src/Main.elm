@@ -6,9 +6,7 @@ import Browser
 import Html exposing (Html, button, div, h1, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Msg exposing (Msg)
-import Queen exposing (Queen)
-import SelectedQueen exposing (SelectedQueen)
+import Queen exposing (Msg, Queen, view)
 
 
 main =
@@ -24,7 +22,7 @@ type alias Position =
 
 
 type alias Model =
-    { selectedQueen : SelectedQueen.SelectedQueen
+    { selectedQueen : Queen.SelectedQueen
     , queens : List Queen
     , board : Board.Board
     , queenAgainst : List ( Position, Position )
@@ -49,8 +47,7 @@ initQueens =
 
 init : Model
 init =
-    -- { selectedQueen = Board.SelectedQueen.NothingSelected
-    { selectedQueen = SelectedQueen.NothingSelected
+    { selectedQueen = Queen.NothingSelected
     , queens = initQueens
     , board = Board.init nbPiece
     , queenAgainst = []
@@ -64,35 +61,35 @@ init =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Msg.Select queen ->
+        Queen.Select queen ->
             case model.selectedQueen of
-                SelectedQueen.Available selectedAvailableQueen ->
+                Queen.Available selectedAvailableQueen ->
                     if queen == selectedAvailableQueen then
                         { model
-                            | selectedQueen = SelectedQueen.NothingSelected
+                            | selectedQueen = Queen.NothingSelected
                         }
 
                     else
                         { model
-                            | selectedQueen = SelectedQueen.Available queen
+                            | selectedQueen = Queen.Available queen
                         }
 
-                SelectedQueen.Placed selectedPlacedQueen ->
+                Queen.Placed selectedPlacedQueen ->
                     { model
-                        | selectedQueen = SelectedQueen.Available queen
+                        | selectedQueen = Queen.Available queen
                     }
 
-                SelectedQueen.NothingSelected ->
+                Queen.NothingSelected ->
                     { model
-                        | selectedQueen = SelectedQueen.Available queen
+                        | selectedQueen = Queen.Available queen
                     }
 
-        Msg.SelectCell i j ->
+        Queen.SelectCell i j ->
             case Board.hasQueenAt model.board i j of
                 -- If a queen is selected on the board
                 Just queen ->
                     case model.selectedQueen of
-                        SelectedQueen.Placed alreadySelectedQueen ->
+                        Queen.Placed alreadySelectedQueen ->
                             -- If it is the double click on a placed queen
                             if alreadySelectedQueen == queen then
                                 let
@@ -102,30 +99,30 @@ update msg model =
                                 { model
                                     | board = updatedBoard
                                     , queens = alreadySelectedQueen :: model.queens
-                                    , selectedQueen = SelectedQueen.NothingSelected
+                                    , selectedQueen = Queen.NothingSelected
                                     , queenAgainst = Board.updateQueenAgainst updatedBoard
                                 }
                                 -- If the click is on another queen
 
                             else
                                 { model
-                                    | selectedQueen = SelectedQueen.Placed queen
+                                    | selectedQueen = Queen.Placed queen
                                 }
 
-                        SelectedQueen.Available alreadySelectedQueen ->
+                        Queen.Available alreadySelectedQueen ->
                             { model
-                                | selectedQueen = SelectedQueen.Placed queen
+                                | selectedQueen = Queen.Placed queen
                             }
 
-                        SelectedQueen.NothingSelected ->
+                        Queen.NothingSelected ->
                             { model
-                                | selectedQueen = SelectedQueen.Placed queen
+                                | selectedQueen = Queen.Placed queen
                             }
 
                 -- If an empty cell is selected on the board
                 Nothing ->
                     case model.selectedQueen of
-                        SelectedQueen.Available queen ->
+                        Queen.Available queen ->
                             let
                                 updatedBoard =
                                     Board.placeQueen model.board queen i j
@@ -133,27 +130,27 @@ update msg model =
                             { model
                                 | queens = removeQueenAvailable queen model.queens
                                 , board = updatedBoard
-                                , selectedQueen = SelectedQueen.NothingSelected
+                                , selectedQueen = Queen.NothingSelected
                                 , queenAgainst = Board.updateQueenAgainst updatedBoard
                             }
 
-                        SelectedQueen.Placed queen ->
+                        Queen.Placed queen ->
                             let
                                 updatedBoard =
                                     Board.placeQueen model.board queen i j
                             in
                             { model
                                 | board = updatedBoard
-                                , selectedQueen = SelectedQueen.NothingSelected
+                                , selectedQueen = Queen.NothingSelected
                                 , queenAgainst = Board.updateQueenAgainst updatedBoard
                             }
 
-                        SelectedQueen.NothingSelected ->
+                        Queen.NothingSelected ->
                             model
 
-        Msg.Reset ->
+        Queen.Reset ->
             { model
-                | selectedQueen = SelectedQueen.NothingSelected
+                | selectedQueen = Queen.NothingSelected
                 , queens = initQueens
                 , board = Board.init nbPiece
                 , queenAgainst = []
@@ -177,12 +174,12 @@ view model =
         [ h1 [] [ text "8 Queens Puzzle" ]
         , Board.viewBoard model.board model.selectedQueen model.queenAgainst
         , div []
-            [ span [] (List.map (viewQueen model.selectedQueen) model.queens)
+            [ span [] (List.map (Queen.view model.selectedQueen) model.queens)
             ]
         , div []
             [ div [] [ viewVictory model ] ]
         , div []
-            [ button [ onClick Msg.Reset ] [ text "RAZ" ] ]
+            [ button [ onClick Queen.Reset ] [ text "RAZ" ] ]
         ]
 
 
@@ -193,19 +190,3 @@ viewVictory model =
 
     else
         text ""
-
-
-viewQueen : SelectedQueen -> Queen -> Html Msg
-viewQueen selectedQueen queen =
-    span
-        [ onClick (Msg.Select queen)
-        , style "padding" "0.45em"
-        , style "color"
-            (if Board.isSelected selectedQueen queen then
-                "red"
-
-             else
-                "black"
-            )
-        ]
-        [ text queen ]
